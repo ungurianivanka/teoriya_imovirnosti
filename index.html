@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Теорія ймовірності</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    background:linear-gradient(135deg,#0e4d92,#1673d1,#4fc3dc);
+    color:white;
+}
+
+/* ЗАВАНТАЖЕННЯ */
+
+#loader{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:linear-gradient(135deg,#0e4d92,#1673d1,#4fc3dc);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    transition:1s;
+}
+
+.loader-title{
+    text-align:center;
+}
+
+.loader-title h1{
+    font-size:2rem;
+    letter-spacing:2px;
+}
+
+.loader-title p{
+    margin-top:12px;
+    opacity:.8;
+}
+
+.progress-container{
+    width:260px;
+    height:12px;
+    background:rgba(255,255,255,.25);
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:35px;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:white;
+    transition:.15s;
+}
+
+.credit{
+    position:absolute;
+    bottom:20px;
+    font-size:.75rem;
+    text-align:center;
+    opacity:0.7;
+    padding:0 20px;
+}
+
+/* ГОЛОВНА */
+
+#main{
+    display:none;
+    height:100vh;
+    overflow-y:auto;
+    padding:25px;
+}
+
+.hero{
+    margin-top:30px;
+    text-align:center;
+}
+
+.hero h1{
+    font-size:2.4rem;
+    line-height:1.1;
+}
+
+.hero p{
+    margin-top:15px;
+    opacity:.9;
+}
+
+/* Напівпрозорі карточки */
+
+.card{
+    margin-top:20px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(12px);
+    border-radius:25px;
+    padding:20px;
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
+
+.stat{
+    margin:10px 0;
+    font-size:1.05rem;
+}
+
+.button{
+    margin-top:15px;
+    width:100%;
+    border:none;
+    border-radius:18px;
+    padding:16px;
+    font-size:1rem;
+    background:white;
+    color:#0e4d92;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.button:hover{
+    transform:scale(1.02);
+}
+
+.footer{
+    margin:30px 0;
+    font-size:.9rem;
+    text-align:center;
+    opacity:.8;
+}
+
+/* Геометричні кульки */
+
+.circle{
+    position:fixed;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    z-index:-1;
+}
+
+.circle1{
+    width:180px;
+    height:180px;
+    top:-50px;
+    right:-40px;
+}
+
+.circle2{
+    width:220px;
+    height:220px;
+    bottom:-70px;
+    left:-80px;
+}
+
+.circle3{
+    width:100px;
+    height:100px;
+    top:45%;
+    right:10px;
+}
+#catModal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    z-index:9999;
+
+    justify-content:center;
+    align-items:center;
+}
+
+#catModal img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+#closeCat{
+    position:absolute;
+    top:20px;
+    right:25px;
+    font-size:2rem;
+    color:white;
+    cursor:pointer;
+    z-index:10000;
+}
+#gradeModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+}
+
+.modal-content{
+    width:90%;
+    max-width:400px;
+
+    background:white;
+    color:black;
+
+    border-radius:25px;
+    padding:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+#emoji{
+    font-size:5rem;
+    text-align:center;
+    margin:20px 0;
+}
+
+#gradeSlider{
+    width:100%;
+    margin:15px 0;
+}
+
+#gradeText{
+    text-align:center;
+    font-size:1.5rem;
+    font-weight:bold;
+    color:#0e4d92;
+    margin-bottom:15px;
+}
+
+textarea{
+    width:100%;
+    margin-top:15px;
+    padding:10px;
+    border-radius:12px;
+    border:1px solid #ccc;
+    resize:none;
+}
+
+.modal-content button{
+    width:100%;
+    margin-top:15px;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:#1673d1;
+    color:white;
+    font-size:1rem;
+    cursor:pointer;
+}
+
+.modal-content button:hover{
+    background:#0e4d92;
+}
+#factPopup{
+    position:fixed;
+    left:50%;
+    top:30px;
+    transform:translateX(-50%) translateY(-30px);
+
+    width:90%;
+    max-width:380px;
+
+    background:rgba(255,255,255,.95);
+    color:#0e4d92;
+
+    padding:18px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+    font-weight:600;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:.4s;
+
+    z-index:10000;
+}
+
+#factPopup.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+.reasons-card{
+    margin-top:20px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(12px);
+
+    border-radius:25px;
+    padding:20px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,255,255,.2);
+}
+
+#reasonText{
+    min-height:100px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:1.15rem;
+    font-weight:600;
+
+    line-height:1.6;
+}
+
+#dots{
+    margin-top:15px;
+}
+
+.dot{
+    height:10px;
+    width:10px;
+
+    margin:0 3px;
+
+    display:inline-block;
+
+    background:rgba(255,255,255,.4);
+
+    border-radius:50%;
+}
+
+.dot.active{
+    background:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="circle circle1"></div>
+<div class="circle circle2"></div>
+<div class="circle circle3"></div>
+
+<!-- ЕКРАН ЗАВАНТАЖЕННЯ -->
+
+<div id="loader">
+
+    <div class="loader-title">
+        <h1>ТЕОРІЯ ЙМОВІРНОСТІ</h1>
+        <p>Ініціалізація простору подій...</p>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <p id="percent">0%</p>
+
+    <div class="credit">
+        Розроблено Унгурян Іванною<br>
+        спеціально для Ігоря Васильовича
+    </div>
+
+</div>
+
+<!-- ГОЛОВНА -->
+
+<div id="main">
+
+    <div class="hero">
+        <h1>ТЕОРІЯ<br>ЙМОВІРНОСТІ</h1>
+
+        <p>
+            Шановний Ігорю Васильовичу,
+            ласкаво просимо на сайт,
+            створення якого мало невелику
+            ймовірність, але все ж відбулося 😁
+        </p>
+    </div>
+
+    <div class="card">
+
+        <h2>Статистичний аналіз</h2>
+
+        <div class="stat">
+            ✅ Термінів у словнику: 100+
+        </div>
+
+        <div class="stat">
+            ☕ Випито кави: багато
+        </div>
+
+        <div class="stat">
+            📚 Вивчено термінів: дуже багато
+        </div>
+
+        <div class="stat">
+            🏆 Ймовірність отримати відмінно:
+            99.999%
+        </div>
+
+    </div>
+<div class="reasons-card">
+
+    <h2>📊 Незалежна експертна оцінка</h2>
+
+    <div id="reasonText">
+        ✅ У словнику зібрано понад 100 термінів.
+    </div>
+
+    <div id="dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+
+</div>
+<button class="button" onclick="showFact()">
+    🎓 Випадковий студентський факт
+</button>
+
+<button class="button" onclick="showCat()">
+    🐱 Показати котика
+</button>
+
+    <button class="button">
+        📖 Переглянути словник
+    </button>
+
+<button class="button" onclick="openGradeModal()">
+    🏆 Поставити відмінно
+</button>
+
+    <div class="footer">
+        ©Унгурян І. В | 226 група | Термінологічний словник з теорії ймовірності | 2026
+    </div>
+
+</div>
+<div id="gradeModal">
+
+    <div class="modal-content">
+
+        <h2>Оцініть словник 😊</h2>
+
+        <div id="emoji">
+            😐
+        </div>
+
+        <input
+            type="range"
+            min="60"
+            max="100"
+            value="80"
+            id="gradeSlider">
+
+        <p id="gradeText">80</p>
+
+        <form action="https://formsubmit.co/ТВОЯПОШТА@gmail.com"
+              method="POST">
+
+            <input
+                type="hidden"
+                id="gradeValue"
+                name="Оцінка">
+
+            <textarea
+                id="comment"
+                name="Коментар"
+                placeholder="Залишити коментар..."></textarea>
+
+            <button type="submit">
+                Надіслати оцінку
+            </button>
+
+        </form>
+
+    </div>
+</div>
+<div id="catModal">
+
+    <span id="closeCat" onclick="closeCat()">✕</span>
+
+    <img src="images/cat.png" alt="Котик">
+
+</div>
+<div id="factPopup"></div>
+<script>
+
+let progress = 0;
+
+const bar = document.getElementById("progress");
+const percent = document.getElementById("percent");
+
+const interval = setInterval(() => {
+
+    progress++;
+
+    bar.style.width = progress + "%";
+    percent.textContent = progress + "%";
+
+    if(progress >= 100){
+
+        clearInterval(interval);
+
+        setTimeout(() => {
+
+            document.getElementById("loader").style.opacity = "0";
+
+            setTimeout(() => {
+
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("main").style.display = "block";
+
+                document.body.style.overflow = "auto";
+
+            },1000);
+
+        },500);
+
+    }
+
+},25);
+function showCat() {
+    document.getElementById("catModal").style.display = "flex";
+}
+
+function closeCat() {
+    document.getElementById("catModal").style.display = "none";
+}
+function openGradeModal() {
+    document.getElementById("gradeModal").style.display = "flex";
+}
+
+window.onload = function () {
+
+    const slider = document.getElementById("gradeSlider");
+    const emoji = document.getElementById("emoji");
+    const gradeText = document.getElementById("gradeText");
+    const gradeValue = document.getElementById("gradeValue");
+
+    slider.addEventListener("input", () => {
+
+        let value = slider.value;
+
+        gradeText.textContent = value;
+        gradeValue.value = value;
+
+if (value < 70) {
+    emoji.innerHTML = "😕";
+}
+else if (value < 85) {
+    emoji.innerHTML = "🙂";
+}
+else if (value < 95) {
+    emoji.innerHTML = "😎";
+}
+else if (value < 100) {
+    emoji.innerHTML = "🥺🏆";
+}
+else {
+    emoji.innerHTML = `
+        👑🐱🏆
+
+        <div style="
+            font-size:16px;
+            margin-top:15px;
+            color:#0e4d92;
+            font-weight:bold;
+            line-height:1.5;
+        ">
+            Ймовірність правильності цього вибору = 1
+            <br><br>
+            Математично доведено ✅
+        </div>
+    `;
+}
+    });
+
+};
+const facts = [
+
+    "Статистично студент починає готуватися до іспиту за ніч до нього.",
+
+    "Кількість випитої кави прямо пропорційна складності предмета.",
+
+    "Якщо створено сайт для викладача, ймовірність високої оцінки зростає.",
+
+    "Словник на 100+ термінів зустрічається рідше, ніж комета Галлея.",
+
+    "Кіт у чоботях рекомендує поставити відмінно.",
+
+    "Імовірність випадково вивчити всі терміни дорівнює приблизно нулю.",
+
+    "Ймовірність того, що авторка цього сайту дуже старалась, дорівнює 1.",
+
+    "Математичне сподівання оцінки цього словника: 100 балів.",
+
+    "Проведений аналіз показав відсутність причин не поставити відмінно.",
+
+    "Наука поки не спростувала користь високих оцінок."
+];
+
+let popupTimeout;
+
+function showFact() {
+
+    const popup = document.getElementById("factPopup");
+
+    const secretFacts = [
+
+        "🏆 Рекомендована оцінка: ВІДМІННО.",
+
+        "⚠ Система виявила студента, який навіть створив сайт.",
+
+        "📈 Ймовірність того, що авторка дуже старалася = 1.",
+
+        "🎓 Згідно з результатами аналізу, словник перевищує середній рівень ентузіазму.",
+
+        "👑 Наукова рада кота в чоботях рекомендує поставити максимальний бал.",
+
+        "✅ Математично доведено: відмінно є коректним вибором.",
+
+        "📊 Похибка обчислень становить ±0 балів.",
+
+        "🚨 Увага! Зафіксовано аномально високий рівень підготовки.",
+
+        "🐱 Кіт у чоботях наполягає на справедливому оцінюванні.",
+
+        "🎯 Ймовірність правильності оцінки 100 балів прямує до 1."
+    ];
+
+   let text;
+
+    if (Math.random() < 0.15) {
+        text = secretFacts[Math.floor(Math.random() * secretFacts.length)];
+    } else {
+        text = facts[Math.floor(Math.random() * facts.length)];
+    }
+
+    popup.textContent = text;
+
+    popup.classList.add("show");
+
+    clearTimeout(popupTimeout);
+
+    popupTimeout = setTimeout(() => {
+        popup.classList.remove("show");
+    }, 4000);
+}
+
+const reasons = [
+
+    "✅ У словнику зібрано понад 100 термінів.",
+
+    "✅ Для словника створено окремий сайт.",
+
+    "✅ Авторка добровільно занурилась у теорію ймовірності.",
+
+    "✅ Було витрачено більше часу, ніж хотілось би визнавати.",
+
+    "✅ Авторка навчається у найкращій 226-й групі.",
+
+    "🏆 Після аналізу всіх наявних даних система рекомендує оцінку «відмінно»."
+
+];
+
+let reasonIndex = 0;
+
+window.addEventListener("load", () => {
+
+    setInterval(() => {
+
+        reasonIndex++;
+
+        if (reasonIndex >= reasons.length) {
+            reasonIndex = 0;
+        }
+
+        document.getElementById("reasonText").textContent =
+            reasons[reasonIndex];
+
+        const dots = document.querySelectorAll(".dot");
+
+        dots.forEach(dot => {
+            dot.classList.remove("active");
+        });
+
+        dots[reasonIndex].classList.add("active");
+
+    }, 3500);
+
+});
+</script>
+
+</body>
+</html>
