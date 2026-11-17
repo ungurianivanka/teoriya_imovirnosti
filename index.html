@@ -733,6 +733,14 @@ window.addEventListener("load", () => {
     }, 3500);
 
 });
+    document.querySelector("form").addEventListener("submit", () => {
+
+    const btn = document.querySelector('button[type="submit"]');
+
+    btn.disabled = true;
+    btn.textContent = "Надсилання...";
+
+});
 </script>
 
 </body>
